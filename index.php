@@ -2,6 +2,7 @@
     include 'include/simplehtmldom.inc';
     include 'include/fonctions.inc';
     include 'include/config.inc';
+    date_default_timezone_set('UTC');
     
     if(!isset($_GET['username'])) die('<h1>Erreur</h1><p>Aucun nom d\'utilisateur n\'a &eacute;t&eacute; sp&eacute;cifi&eacute;!</p>');
     if($protection !== false && !isset($_GET['protection']) or $protection !== false && $_GET['protection'] != $protection) die('<h1>Erreur</h1><p>Mauvaise cl&eacute; secr&egrave;te!</p>');
@@ -20,9 +21,9 @@
         $timeline->load($mobile_timeline);
     
         $feed = array(
-            'name'        => trim($timeline->find('div.fullname')[0]->innertext),
-            'url'         => $timeline->find('div.url')[0]->innertext,
-            'description' => $timeline->find('div.bio')[0]->innertext . '<br />' . $timeline->find('div.url')[0]->innertext,
+            'name'        => trim($timeline->find('div.fullname', 0)->innertext),
+            'url'         => $timeline->find('div.url', 0)->innertext,
+            'description' => $timeline->find('div.bio', 0)->innertext . '<br />' . $timeline->find('div.url', 0)->innertext,
             'date'        => $timeline->find('td.timestamp'),
             'timeline'    => $timeline->find('div.tweet-text')
         );
@@ -34,13 +35,14 @@
                 $atom .= '<entry>
     <title>@' . $username . ': ' . rtrim(substr($feed['timeline'][$i]->plaintext, 0, 39)) . '...</title>
     <updated>' . date('c', strtotimestamp($feed['date'][$i]->plaintext)) . '</updated>
-    <link href="https://twitter.com/' . $feed['date'][$i]->find('a')[0]->href . ' "/>
+    <link href="https://twitter.com/' . $feed['date'][$i]->find('a', 0)->href . ' "/>
     <summary><![CDATA[' . preg_replace('/\s{2,}/', ' ', full_links($feed['timeline'][$i]->innertext)) . ']]></summary>
 </entry>';
         $atom .= '</feed>';
     
         write_cache($username, $atom);
     }
+
     else $atom = read_cache($username);
     
     header('Content-type: application/atom+xml; charset=utf-8');
