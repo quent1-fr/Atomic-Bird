@@ -17,12 +17,13 @@
         return str_replace('<a', '<a target="_blank"', $parser->save());
     }
     function write_cache($username, $feed){
-        file_put_contents('cache/' . md5($username) . '.cache', gzdeflate(json_encode($feed), 9));
+        $cache = fopen('cache/' . md5($username) . '.cache', 'w');
+        fwrite($cache, gzdeflate(json_encode($feed), 9));
         return true;
     }
     function cache_age($username){
         if(!file_exists('cache/' . md5($username) . '.cache')) return time() + 3600;
-        return time() - filemtime('cache/' . md5($username) . '.cache');
+        else return time() - filemtime('cache/' . md5($username) . '.cache');
     }
     function read_cache($username){
         $cached = json_decode(gzinflate(file_get_contents('cache/' . md5($username) . '.cache')), true);
