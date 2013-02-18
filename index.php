@@ -49,7 +49,7 @@
                 <item>
                     <title>'.$username.': '. htmlspecialchars(utf8_encode(htmlentities(rtrim(substr($feed['timeline'][$i]->plaintext, 0, 39)), ENT_COMPAT,'utf-8'))).'...</title>
                     <description>'.$username.': '.htmlspecialchars(utf8_encode(htmlentities($feed['timeline'][$i]->plaintext, ENT_COMPAT,'utf-8'))).'</description>
-                    <pubDate>'.date("D, d M Y H:i:s", strtotimestamp($feed['date'][$i]->plaintext)).' GMT</pubDate>
+                    <pubDate>'.date("D, d M Y H:i:s", strtotimestamp($feed['date'][$i]->plaintext)).' +0000</pubDate>
                     <guid>http://twitter.com'.$feed['date'][$i]->find('a', 0)->href.'</guid>
                     <link>http://twitter.com'.$feed['date'][$i]->find('a', 0)->href.'</link>
 
@@ -58,7 +58,7 @@
 
         $rss .= '</channel></rss>';
     
-        //write_cache($username, $rss);
+        write_cache($username, $rss);
     }
 
     else $rss = read_cache($username);
