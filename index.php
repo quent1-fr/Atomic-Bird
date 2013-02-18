@@ -28,23 +28,41 @@
             'timeline'    => $timeline->find('div.tweet-text')
         );
         
-        $atom = '<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Timeline de ' . $feed['name']. ' (@' . $username . ')</title><subtitle>' . $feed['description'] . '</subtitle><updated>' . date('c', strtotimestamp($feed['date'][0]->plaintext)) . '</updated><link href="https://twitter.com/' . $username . '" /><author><name>' . $feed['name'] . '</name><uri>' . $feed['url'] . '</uri></author>';
+        $rss = '<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom">
+        <title>Timeline de ' . $feed['name']. ' (@' . $username . ')</title><subtitle><![CDATA[' . htmlentities($feed['description']) . ']]</subtitle>
+        <updated>' . date('c', strtotimestamp($feed['date'][0]->plaintext)) . '</updated><link href="https://twitter.com/' . $username . '" />
+        <author><name>' . $feed['name'] . '</name><uri>' . $feed['url'] . '</uri></author>';
+
+        $rss = 
+        '<?xml version="1.0" encoding="UTF-8"?> <rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:georss="http://www.georss.org/georss" version="2.0">
+            <channel>
+                <title>Twitter / '.$username.'</title>
+                <link>http://twitter.com/'.$username.'</link>
+                <description>Twitter updates from '.$username.'.</description>
+                <language>en-us</language>
+                <ttl>40</ttl>';
+
         $nbrdate = count($feed['date']) - 1;
         for($i = 0; $i < $nbrdate; $i++)
             if((!$show_mentions && $feed['timeline'][$i]->plaintext[0] != '@') or $show_mentions)
-                $atom .= '<entry>
-    <title>@' . $username . ': ' . rtrim(substr($feed['timeline'][$i]->plaintext, 0, 39)) . '...</title>
-    <updated>' . date('c', strtotimestamp($feed['date'][$i]->plaintext)) . '</updated>
-    <link href="https://twitter.com/' . $feed['date'][$i]->find('a', 0)->href . ' "/>
-    <summary><![CDATA[' . preg_replace('/\s{2,}/', ' ', full_links($feed['timeline'][$i]->innertext)) . ']]></summary>
-</entry>';
-        $atom .= '</feed>';
+                $rss .= '
+                <item>
+                    <title>'.$username.': '. htmlspecialchars(utf8_encode(htmlentities(rtrim(substr($feed['timeline'][$i]->plaintext, 0, 39)), ENT_COMPAT,'utf-8'))).'...</title>
+                    <description>'.$username.': '.htmlspecialchars(utf8_encode(htmlentities($feed['timeline'][$i]->plaintext, ENT_COMPAT,'utf-8'))).'</description>
+                    <pubDate>'.date("D, d M Y H:i:s", strtotimestamp($feed['date'][$i]->plaintext)).' GMT</pubDate>
+                    <guid>http://twitter.com'.$feed['date'][$i]->find('a', 0)->href.'</guid>
+                    <link>http://twitter.com'.$feed['date'][$i]->find('a', 0)->href.'</link>
+
+                    
+                </item>';
+
+        $rss .= '</channel></rss>';
     
-        write_cache($username, $atom);
+        //write_cache($username, $rss);
     }
 
-    else $atom = read_cache($username);
+    else $rss = read_cache($username);
     
-    header('Content-type: application/atom+xml; charset=utf-8');
-    echo $atom;
+    header('Content-type: application/xml; charset=UTF-8');
+    echo $rss;
 ?>
