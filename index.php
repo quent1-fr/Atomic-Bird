@@ -63,8 +63,9 @@
         '<?xml version="1.0" encoding="utf-8"?>
         <feed xml:lang="fr-fr" xmlns="http://www.w3.org/2005/Atom"> 
             <title>Twitter de '.$info['username'].' / '.$info['fullname'].'</title>
-            <subtitle>'.$info['bio'].'</subtitle>
+            <subtitle>'.strip_tags($info['bio']).'</subtitle>
             <link href="https://twitter.com/'.$info['username'].'"/>
+            <link href="http://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'].'?username='.$info['username'].'" rel="self"/>
             <updated>'.date(DATE_ATOM, $now).'</updated>
             <id>https://twitter.com/</id>
             <author>
@@ -77,9 +78,10 @@
             # Déjà, on va convertir la date dans le format qui faut bien. Type possible : 4h, 4d, 13 Feb
             $tweets_date[$key];
 
-            # Si c'est des heures :
-            if(preg_match('#([0-9])*h#', $tweets_date[$key], $hours)):
-                $tweet_date = date(DATE_ATOM, $now - $hours[1] * 60);
+            if(preg_match('#([0-9])*m#', $tweets_date[$key], $minutes)):
+                $tweet_date = date(DATE_ATOM, $now - $minutes[1] * 60);
+            elseif(preg_match('#([0-9])*h#', $tweets_date[$key], $hours)):
+                $tweet_date = date(DATE_ATOM, $now - $hours[1] * 60*60);
             elseif(preg_match('#([0-9])*d#', $tweets_date[$key], $days)):
                 $tweet_date = date(DATE_ATOM, $now - $days[1] * 3600 * 24);
             elseif(preg_match('#([0-9]*) ([A-Za-z]*)#', $tweets_date[$key], $month)):
@@ -94,7 +96,6 @@
                 <title>'.rtrim(substr(strip_tags($tweets[$key]), 0, 39)).'...</title>
                 <updated>'.$tweet_date.'</updated>
                 <link href="https://twitter.com'.$tweets_url[$key].'"/>
-                <link href="'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'].'" rel="self"/>
                 <content type="html"><![CDATA['.utf8_encode(html_entity_decode(htmlentities($tweets[$key], ENT_COMPAT,'utf-8'))).']]></content>
             </entry>
             ';
@@ -109,6 +110,6 @@
         $atom = read_cache($username);
     endif;
     
-    //header('Content-type: application/xml; charset=UTF-8');
-    echo htmlspecialchars($atom);
+    header('Content-type: application/xml; charset=UTF-8');
+    echo $atom;
 ?>
