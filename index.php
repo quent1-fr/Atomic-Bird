@@ -2,6 +2,21 @@
     include 'include/fonctions.inc';
     include 'include/config.inc';
     date_default_timezone_set('UTC');
+    $now = mktime(date('H'), 0, date('s'), date('n'), date('j'), date('Y'));
+    $months_array = array(
+        'Jan' => '01',
+        'Feb' => '02',
+        'Mar' => '03',
+        'Apr' => '04',
+        'May' => '05',
+        'Jun' => '06',
+        'Jul' => '07',
+        'Aug' => '08',
+        'Sep' => '09',
+        'Oct' => '10',
+        'Nov' => '11',
+        'Dec' => '12'
+        );
     
     if(!isset($_GET['username'])) die('<h1>Erreur</h1><p>Aucun nom d\'utilisateur n\'a &eacute;t&eacute; sp&eacute;cifi&eacute;!</p>');
     if($protection !== false && !isset($_GET['protection']) or $protection !== false && $_GET['protection'] != $protection) die('<h1>Erreur</h1><p>Mauvaise cl&eacute; secr&egrave;te!</p>');
@@ -9,7 +24,7 @@
     
     $username = strtolower($_GET['username']);
     
-    if(1==1){
+    if(1==1):
         ini_set('user_agent', $user_agent);
         
         // $mobile_timeline = @file_get_contents('https://mobile.twitter.com/' . $username);
@@ -36,7 +51,6 @@
         // TODO : différencier les RT des tweets.
         $regex_tweets = '#<div class="tweet-text" data-id="[0-9]*"><div class="dir-ltr" dir="ltr">(.*)</div></div>#iU';
         preg_match_all($regex_tweets, $mobile_timeline, $tweets);
-        echo "<pre>";
         // print_r($tweets[1]);
         $tweets = $tweets[1];
 
@@ -52,33 +66,55 @@
         // print_r($tweets_date[1]);
         $tweets_date = $tweets_date[1];
 
-        // foreach ($tweets_url[1] as $key => $value) {
-        //     echo '<a href="https://twitter.com'.$value.'">'.$key.'</a><br/>';
-        // }
-
-        // print_r($info);
-
-        # 
-        // foreach ($r as $v) {
-        //     echo htmlspecialchars($v);
-        // }
-        //echo preg_match($regex_fullname, $mobile_timeline);
-
-        // echo $mobile_timeline;
+        
+        # Generation du RSS :
         $rss = 
-        '<feed xml:lang="fr-fr" xmlns="http://www.w3.org/2005/Atom"> 
+        '<?xml version="1.0" encoding="utf-8"?>
+        <feed xml:lang="fr-fr" xmlns="http://www.w3.org/2005/Atom"> 
             <title>Twitter de '.$info['username'].' / '.$info['fullname'].'</title>
             <subtitle>'.$info['bio'].'</subtitle>
             <link href="https://twitter.com/'.$info['username'].'"/>
-            <updated></updates>
+            <updated></updated>
             <author>
                 <name>'.$info['fullname'].'</name>
             </author>
         ';
-    } 
 
-    else $rss = read_cache($username);
+        $i = 0;
+        foreach ($tweets as $key => $value):
+            # Déjà, on va convertir la date dans le format qui faut bien. Type possible : 4h, 4d, 13 Feb
+            $tweets_date[$key];
+
+            # Si c'est des heures :
+            if(preg_match('#([0-9])*h#', $tweets_date[$key], $hours)):
+                $tweet_date = date(DATE_ATOM, $now - $hours[1] * 60);
+            elseif(preg_match('#([0-9])*d#', $tweets_date[$key], $days)):
+                $tweet_date = date(DATE_ATOM, $now - $days[1] * 3600 * 24);
+            elseif(preg_match('#([0-9]*) ([A-Za-z]*)#', $tweets_date[$key], $month)):
+                $tweet_date = date(DATE_ATOM, mktime('12', 0, 0, $months_array[$month[2]], $month[1], date('Y')) - $i*60*15);
+            else:
+                $tweet_date = '';
+            endif;
+
+            $rss .=
+            '<entry>
+                <title>'.rtrim(substr(strip_tags($tweets[$key]), 0, 39)).'...</title>
+                <updated>'.$tweet_date.'</updated>
+                <link href="https://twitter.com'.$tweets_url[$key].'"/>
+                <content type="html"><![CDATA['.utf8_encode(html_entity_decode(htmlentities($tweets[$key], ENT_COMPAT,'utf-8'))).']]></content>
+            </entry>
+            ';
+
+            // echo '<a href="https://twitter.com'.$value.'">'.$key.'</a><br/>';
+            $i++;
+        endforeach;
+
+        $rss .= '</feed>';
+
+    else: 
+        $rss = read_cache($username);
+    endif;
     
-    //header('Content-type: application/xml; charset=UTF-8');
-    //echo $rss;
+    header('Content-type: application/xml; charset=UTF-8');
+    echo $rss;
 ?>
