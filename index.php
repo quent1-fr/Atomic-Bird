@@ -24,7 +24,7 @@
     
     $username = strtolower($_GET['username']);
     
-    if(1==1):
+    if(cache_age($username) > $cache_time * 60):
         ini_set('user_agent', $user_agent);
         
         $mobile_timeline = file_get_contents('https://mobile.twitter.com/' . $username) or die('<h1>Erreur</h1><p>Le twittos n\'existe pas!</p>');
@@ -65,7 +65,8 @@
             <title>Twitter de '.$info['username'].' / '.$info['fullname'].'</title>
             <subtitle>'.$info['bio'].'</subtitle>
             <link href="https://twitter.com/'.$info['username'].'"/>
-            <updated></updated>
+            <updated>'.date(DATE_ATOM, $now).'</updated>
+            <id>https://twitter.com/</id>
             <author>
                 <name>'.$info['fullname'].'</name>
             </author>
@@ -89,9 +90,11 @@
 
             $atom .=
             '<entry>
+                <id>https://twitter.com'.$tweets_url[$key].'</id>
                 <title>'.rtrim(substr(strip_tags($tweets[$key]), 0, 39)).'...</title>
                 <updated>'.$tweet_date.'</updated>
                 <link href="https://twitter.com'.$tweets_url[$key].'"/>
+                <link href="'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'].'" rel="self"/>
                 <content type="html"><![CDATA['.utf8_encode(html_entity_decode(htmlentities($tweets[$key], ENT_COMPAT,'utf-8'))).']]></content>
             </entry>
             ';
@@ -106,6 +109,6 @@
         $atom = read_cache($username);
     endif;
     
-    header('Content-type: application/xml; charset=UTF-8');
-    echo $atom;
+    //header('Content-type: application/xml; charset=UTF-8');
+    echo htmlspecialchars($atom);
 ?>
