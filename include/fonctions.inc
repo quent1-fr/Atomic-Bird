@@ -16,9 +16,23 @@
         foreach($liens as $lien) if($lien->href[0] == '/') $lien->href = 'https://twitter.com' . $lien->href;
         return str_replace('<a', '<a target="_blank"', $parser->save());
     }
+    // function write_cache($username, $feed){
+    //     $cache = fopen('cache/' . md5($username) . '.cache', 'w');
+    //     fwrite($cache, gzdeflate($feed, 9));
+    //     return true;
+    // }
+    // function cache_age($username){
+    //     if(!file_exists('cache/' . md5($username) . '.cache')) return time() + 3600;
+    //     else return time() - filemtime('cache/' . md5($username) . '.cache');
+    // }
+    // function read_cache($username){
+    //     $cached = gzinflate(file_get_contents('cache/' . md5($username) . '.cache'));
+    //     return $cached;
+    // }
+
     function write_cache($username, $feed){
         $cache = fopen('cache/' . md5($username) . '.cache', 'w');
-        fwrite($cache, gzdeflate($feed, 9));
+        fwrite($cache, $feed);
         return true;
     }
     function cache_age($username){
@@ -26,7 +40,7 @@
         else return time() - filemtime('cache/' . md5($username) . '.cache');
     }
     function read_cache($username){
-        $cached = gzinflate(file_get_contents('cache/' . md5($username) . '.cache'));
+        $cached = file_get_contents('cache/' . md5($username) . '.cache');
         return $cached;
     }
 ?>
