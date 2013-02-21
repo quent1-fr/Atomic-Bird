@@ -18,7 +18,7 @@
     }
     function write_cache($username, $feed){
         $cache = fopen('cache/' . md5($username) . '.cache', 'w');
-        fwrite($cache, gzdeflate(json_encode($feed), 9));
+        fwrite($cache, gzdeflate($feed, 9));
         return true;
     }
     function cache_age($username){
@@ -26,7 +26,7 @@
         else return time() - filemtime('cache/' . md5($username) . '.cache');
     }
     function read_cache($username){
-        $cached = json_decode(gzinflate(file_get_contents('cache/' . md5($username) . '.cache')), true);
+        $cached = gzinflate(file_get_contents('cache/' . md5($username) . '.cache'));
         return $cached;
     }
 ?>
