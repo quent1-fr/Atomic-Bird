@@ -27,16 +27,10 @@
     if(1==1):
         ini_set('user_agent', $user_agent);
         
-        // $mobile_timeline = @file_get_contents('https://mobile.twitter.com/' . $username);
-        // write_cache('debetux', $mobile_timeline);
-        $mobile_timeline = read_cache('debetux');
-    
-        if(!$mobile_timeline) die('<h1>Erreur</h1><p>Le twittos n\'existe pas!</p>');
+        $mobile_timeline = file_get_contents('https://mobile.twitter.com/' . $username) or die('<h1>Erreur</h1><p>Le twittos n\'existe pas!</p>');
 
         # On y va a grand coup de regex pour récupérer tout qui va bien.
         # Le nom déjà
-        // $regex_fullname = '#<div class="fullname#';
-        // $regex_fullname = '/<div class="(.*)/iU';
         $regex_fullname = '#<div class="fullname">(.*)#';
         preg_match($regex_fullname, $mobile_timeline, $fullname);
         $info['fullname'] = $fullname[1];
@@ -51,24 +45,21 @@
         // TODO : différencier les RT des tweets.
         $regex_tweets = '#<div class="tweet-text" data-id="[0-9]*"><div class="dir-ltr" dir="ltr">(.*)</div></div>#iU';
         preg_match_all($regex_tweets, $mobile_timeline, $tweets);
-        // print_r($tweets[1]);
         $tweets = $tweets[1];
 
         # URLs des tweets
         $regex_tweets_url = '#<table class="tweet" href="(.*)">#iU';
         preg_match_all($regex_tweets_url, $mobile_timeline, $tweets_url);
-        // print_r($tweets_url[1]);
         $tweets_url = $tweets_url[1];
 
         # La date !
         $regex_tweets_date = '#<a name="tweet_[0-9]*" href=".*">(.*)</a>#iU';
         preg_match_all($regex_tweets_date, $mobile_timeline, $tweets_date);
-        // print_r($tweets_date[1]);
         $tweets_date = $tweets_date[1];
 
         
         # Generation du RSS :
-        $rss = 
+        $atom = 
         '<?xml version="1.0" encoding="utf-8"?>
         <feed xml:lang="fr-fr" xmlns="http://www.w3.org/2005/Atom"> 
             <title>Twitter de '.$info['username'].' / '.$info['fullname'].'</title>
@@ -96,7 +87,7 @@
                 $tweet_date = '';
             endif;
 
-            $rss .=
+            $atom .=
             '<entry>
                 <title>'.rtrim(substr(strip_tags($tweets[$key]), 0, 39)).'...</title>
                 <updated>'.$tweet_date.'</updated>
@@ -105,16 +96,16 @@
             </entry>
             ';
 
-            // echo '<a href="https://twitter.com'.$value.'">'.$key.'</a><br/>';
             $i++;
         endforeach;
 
-        $rss .= '</feed>';
+        $atom .= '</feed>';
+        write_cache($info['username'], $atom);
 
     else: 
-        $rss = read_cache($username);
+        $atom = read_cache($username);
     endif;
     
     header('Content-type: application/xml; charset=UTF-8');
-    echo $rss;
+    echo $atom;
 ?>
