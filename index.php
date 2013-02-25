@@ -2,7 +2,6 @@
     include 'include/fonctions.inc';
     include 'include/config.inc';
     date_default_timezone_set('UTC');
-    $now = mktime(date('H'), 0, date('s'), date('n'), date('j'), date('Y'));
     
     if(!isset($_GET['username'])) die('<h1>Erreur</h1><p>Aucun nom d\'utilisateur n\'a &eacute;t&eacute; sp&eacute;cifi&eacute;!</p>');
     if($protection !== false && !isset($_GET['protection']) or $protection !== false && $_GET['protection'] != $protection) die('<h1>Erreur</h1><p>Mauvaise cl&eacute; secr&egrave;te!</p>');
@@ -41,7 +40,6 @@
         $regex_tweets_date = '#<a name="tweet_[0-9]*" href=".*">(.*)</a>#iU';
         preg_match_all($regex_tweets_date, $mobile_timeline, $tweets_date);
         $tweets_date = $tweets_date[1];
-
         
         # Generation du RSS :
         $atom = 
@@ -51,7 +49,7 @@
             <subtitle>'.strip_tags($info['bio']).'</subtitle>
             <link href="https://twitter.com/'.$info['username'].'"/>
             <link href="http://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'].'?username='.$info['username'].'" rel="self"/>
-            <updated>'.date(DATE_ATOM, $now).'</updated>
+            <updated>'.date('c', strtotimestamp($tweets_date[0])).'</updated>
             <id>https://twitter.com/</id>
             <author>
                 <name>'.$info['fullname'].'</name>
