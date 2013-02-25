@@ -75,26 +75,14 @@
 
         $i = 0;
         foreach ($tweets as $key => $value):
-            # Déjà, on va convertir la date dans le format qui faut bien. Type possible : 4h, 4d, 13 Feb
-            $tweets_date[$key];
-
-            if(preg_match('#([0-9])*m#', $tweets_date[$key], $minutes)):
-                $tweet_date = date(DATE_ATOM, $now - $minutes[1] * 60);
-            elseif(preg_match('#([0-9])*h#', $tweets_date[$key], $hours)):
-                $tweet_date = date(DATE_ATOM, $now - $hours[1] * 60*60);
-            elseif(preg_match('#([0-9])*d#', $tweets_date[$key], $days)):
-                $tweet_date = date(DATE_ATOM, $now - $days[1] * 3600 * 24);
-            elseif(preg_match('#([0-9]*) ([A-Za-z]*)#', $tweets_date[$key], $month)):
-                $tweet_date = date(DATE_ATOM, mktime('12', 0, 0, $months_array[$month[2]], $month[1], date('Y')) - $i*60*15);
-            else:
-                $tweet_date = '';
-            endif;
+            # On converti la date relative en un timestamp absolu. On la convertira en date valide plus tard, grâce à la fonction date et au paramètre « c »
+            $tweets_date[$key] = strtotimestamp($tweets_date[$key]);
 
             $atom .=
             '<entry>
                 <id>https://twitter.com' . $tweets_url[$key] . '</id>
                 <title><![CDATA[' . rtrim(substr(strip_tags(html_entity_decode($tweets[$key])), 0, 39)). '...]]></title>
-                <updated>' . $tweet_date . '</updated>
+                <updated>' . date('c', $tweets_date[$key]) . '</updated>
                 <link href="https://twitter.com' . $tweets_url[$key] . '"/>
                 <content type="html"><![CDATA[' . str_replace(' href="/', ' href="https://twitter.com/', $tweets[$key]) . ']]></content>
             </entry>
