@@ -9,13 +9,6 @@
         elseif(strtotime($date) !== false) return strtotime($date);
         else return false;        
     }
-    function full_links($tweet){
-        $parser = new simple_html_dom();
-        $parser->load($tweet);
-        $liens = $parser->find('a');
-        foreach($liens as $lien) if($lien->href[0] == '/') $lien->href = 'https://twitter.com' . $lien->href;
-        return str_replace('<a', '<a target="_blank"', $parser->save());
-    }
     function write_cache($username, $feed){
         $cache = fopen('cache/' . md5($username) . '.cache', 'w');
         fwrite($cache, gzdeflate($feed, 9));
