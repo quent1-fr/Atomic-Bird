@@ -81,7 +81,7 @@
             $atom .=
             '<entry>
                 <id>https://twitter.com' . $tweets_url[$key] . '</id>
-                <title><![CDATA[' . rtrim(substr(strip_tags(html_entity_decode($tweets[$key])), 0, 39)). '...]]></title>
+                <title><![CDATA[' . title_formated($tweets[$key]). ']]></title>
                 <updated>' . date('c', $tweets_date[$key]) . '</updated>
                 <link href="https://twitter.com' . $tweets_url[$key] . '"/>
                 <content type="html"><![CDATA[' . str_replace(' href="/', ' href="https://twitter.com/', $tweets[$key]) . ']]></content>

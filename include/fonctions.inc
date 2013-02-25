@@ -22,4 +22,11 @@
         $cached = gzinflate(file_get_contents('cache/' . md5($username) . '.cache'));
         return $cached;
     }
+    function title_formated($tweet){
+        $tweet = strip_tags(html_entity_decode($tweet));
+	if(strlen($tweet) <= 40)
+	    return $tweet;
+	$sub = substr($tweet, 0, 39);
+	return rtrim(substr($sub, 0, strrpos($sub,' '))) . '...';
+    }
 ?>
