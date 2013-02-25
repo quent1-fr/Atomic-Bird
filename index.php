@@ -3,20 +3,6 @@
     include 'include/config.inc';
     date_default_timezone_set('UTC');
     $now = mktime(date('H'), 0, date('s'), date('n'), date('j'), date('Y'));
-    $months_array = array(
-        'Jan' => '01',
-        'Feb' => '02',
-        'Mar' => '03',
-        'Apr' => '04',
-        'May' => '05',
-        'Jun' => '06',
-        'Jul' => '07',
-        'Aug' => '08',
-        'Sep' => '09',
-        'Oct' => '10',
-        'Nov' => '11',
-        'Dec' => '12'
-        );
     
     if(!isset($_GET['username'])) die('<h1>Erreur</h1><p>Aucun nom d\'utilisateur n\'a &eacute;t&eacute; sp&eacute;cifi&eacute;!</p>');
     if($protection !== false && !isset($_GET['protection']) or $protection !== false && $_GET['protection'] != $protection) die('<h1>Erreur</h1><p>Mauvaise cl&eacute; secr&egrave;te!</p>');
