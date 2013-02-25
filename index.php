@@ -28,7 +28,6 @@
         $info['bio'] = $bio[1];
 
         # Passons aux tweets !
-        // TODO : différencier les RT des tweets.
         $regex_tweets = '#<div class="tweet-text" data-id="[0-9]*"><div class="dir-ltr" dir="ltr">(.*)</div></div>#iU';
         preg_match_all($regex_tweets, $mobile_timeline, $tweets);
         $tweets = $tweets[1];
@@ -63,14 +62,20 @@
         foreach ($tweets as $key => $value):
             # On converti la date relative en un timestamp absolu. On la convertira en date valide plus tard, grâce à la fonction date et au paramètre « c »
             $tweets_date[$key] = strtotimestamp($tweets_date[$key]);
-
+            
+            # On regarde si c'est un retweet par recherche du pseudo dans l'URL du tweet
+            $prefixe = null;
+            $posteur = explode('/', $tweets_url[$key])[1];
+            if(strtolower($info['username']) != strtolower($posteur))
+                $prefixe = 'RT <a href="https://twitter.com/' . $posteur . '">@' . $posteur . '</a>: ';
+        
             $atom .=
             '<entry>
                 <id>https://twitter.com' . $tweets_url[$key] . '</id>
-                <title><![CDATA[' . title_formated($tweets[$key]). ']]></title>
+                <title><![CDATA[' . title_formated($prefixe . $tweets[$key]). ']]></title>
                 <updated>' . date('c', $tweets_date[$key]) . '</updated>
                 <link href="https://twitter.com' . $tweets_url[$key] . '"/>
-                <content type="html"><![CDATA[' . str_replace(' href="/', ' href="https://twitter.com/', $tweets[$key]) . ']]></content>
+                <content type="html"><![CDATA[' . $prefixe . str_replace(' href="/', ' href="https://twitter.com/', $tweets[$key]) . ']]></content>
             </entry>
             ';
 

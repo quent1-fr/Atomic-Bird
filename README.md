@@ -8,7 +8,7 @@ Ce script dispose d'un cache d'une durée minimale de 10 minutes. Merci de bien 
 ## Installation
 
 1. Décompressez le ficher téléchargé
-2. Copiez le dossier obtenur sur votre serveur
+2. Copiez le dossier obtenu sur votre serveur
 3. Autorisez PHP à écrire à l'intérieur du dossier cache/
 3. Configurez votre script à l'aide du fichier include/config.inc
 
@@ -24,4 +24,3 @@ Pour utiliser ce script, passez simplement le nom d'utilisateur dont vous souhai
 
 ## Todo
 * Afficher plus de tweets (jusqu'à 50 par exemple)
-* Différencier les RTs des autres tweets
