@@ -18,8 +18,9 @@ Pour utiliser ce script, passez simplement le nom d'utilisateur dont vous souhai
 
 **Exemple**: *http://monserveur.fr/Atomic-Bird/index.php?username=google* vous renverra la timeline du compte officiel de Google sur Twitter.
 
-## Licences
-* Atomic Bird: distribué sous licence Licence publique générale GNU
+## Licence
+* Atomic Bird est distribué selon les termes de la [Licence Creative Commons Attribution - Pas d’Utilisation Commerciale - Partage dans les Mêmes Conditions 2.0 France](http://creativecommons.org/licenses/by-nc-sa/2.0/fr/).
+![CC BY-NC-SA](http://i.creativecommons.org/l/by-nc-sa/2.0/fr/88x31.png)
 
 ## Todo
 * Afficher plus de tweets (jusqu'à 50 par exemple)
