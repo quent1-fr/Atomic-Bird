@@ -78,7 +78,7 @@
         endforeach;
 
         $atom .= '</feed>';
-        write_cache($info['username'], $atom);
+        write_cache($username, $atom);
 
     else: 
         $atom = read_cache($username);
