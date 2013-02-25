@@ -67,15 +67,17 @@
             if(strtolower($info['username']) != strtolower($posteur))
                 $prefixe = 'RT <a href="https://twitter.com/' . $posteur . '">@' . $posteur . '</a>: ';
         
-            $atom .=
-            '<entry>
-                <id>https://twitter.com' . $tweets_url[$key] . '</id>
-                <title><![CDATA[' . title_formated($prefixe . $tweets[$key]). ']]></title>
-                <updated>' . date('c', $tweets_date[$key]) . '</updated>
-                <link href="https://twitter.com' . $tweets_url[$key] . '"/>
-                <content type="html"><![CDATA[' . $prefixe . str_replace(' href="/', ' href="https://twitter.com/', $tweets[$key]) . ']]></content>
-            </entry>
-            ';
+            # Si $show_mentions est à false et que le tweet commence par « @ », on passe le tweet
+            if(!(!$show_mentions && substr(strip_tags($tweets[$key]), 0, 1) == '@'))
+                $atom .=
+                '<entry>
+                    <id>https://twitter.com' . $tweets_url[$key] . '</id>
+                    <title><![CDATA[' . title_formated($prefixe . $tweets[$key]). ']]></title>
+                    <updated>' . date('c', $tweets_date[$key]) . '</updated>
+                    <link href="https://twitter.com' . $tweets_url[$key] . '"/>
+                    <content type="html"><![CDATA[' . $prefixe . str_replace(' href="/', ' href="https://twitter.com/', $tweets[$key]) . ']]></content>
+                </entry>
+                ';
 
             $i++;
         endforeach;
