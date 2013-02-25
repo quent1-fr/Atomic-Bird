@@ -92,11 +92,11 @@
 
             $atom .=
             '<entry>
-                <id>https://twitter.com'.$tweets_url[$key].'</id>
-                <title>'.rtrim(substr(strip_tags($tweets[$key]), 0, 39)).'...</title>
-                <updated>'.$tweet_date.'</updated>
-                <link href="https://twitter.com'.$tweets_url[$key].'"/>
-                <content type="html"><![CDATA['.utf8_encode(html_entity_decode(htmlentities($tweets[$key], ENT_COMPAT,'utf-8'))).']]></content>
+                <id>https://twitter.com' . $tweets_url[$key] . '</id>
+                <title><![CDATA[' . rtrim(substr(strip_tags(html_entity_decode($tweets[$key])), 0, 39)). '...]]></title>
+                <updated>' . $tweet_date . '</updated>
+                <link href="https://twitter.com' . $tweets_url[$key] . '"/>
+                <content type="html"><![CDATA[' . str_replace(' href="/', ' href="https://twitter.com/', $tweets[$key]) . ']]></content>
             </entry>
             ';
 
